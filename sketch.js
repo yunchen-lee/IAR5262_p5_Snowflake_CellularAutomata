@@ -1,4 +1,5 @@
 let n_slider, a_slider, b_slider, g_slider;
+let n_p, a_p, b_p, g_p;
 let start_button, pause_button;
 let gameStart = false;
 let gamePause = true;
@@ -10,6 +11,8 @@ var alphaa = 3; // diffusion coefficient
 var beta = 0.95; // background coefficient
 var gamma = 0.0001; // vapour addition
 var flakeSize = 200;
+
+var ta, tb, tg;
 
 
 function setup() {
@@ -23,26 +26,33 @@ function setup() {
     n_slider = createSlider(0, 50, n, 1);
     n_slider.position(slider_xpos, slider_ypos);
     n_slider.size(100);
-    let n_p = createP('Grid Size(n)');
+    n_p = createP('Grid Size(n): ' + n);
     n_p.position(n_slider.x + n_slider.width + 15, n_slider.y - 15);
+    n_slider.input(updateVariable)
 
     a_slider = createSlider(0, 5, alphaa, 0.01);
     a_slider.position(slider_xpos, slider_ypos + slider_yspan);
     a_slider.size(100);
-    let a_p = createP('Alpha(α): diffusion coefficient');
+    a_p = createP('Diffusion Coefficient(α): ' + alphaa);
     a_p.position(a_slider.x + a_slider.width + 15, a_slider.y - 15);
+    a_slider.input(updateVariable)
+
 
     b_slider = createSlider(0, 1, beta, 0.001);
     b_slider.position(slider_xpos, slider_ypos + slider_yspan * 2);
     b_slider.size(100);
-    let b_p = createP('Beta(β): background level');
+    b_p = createP('Background Level(β): ' + beta);
     b_p.position(b_slider.x + b_slider.width + 15, b_slider.y - 15);
+    b_slider.input(updateVariable)
 
-    g_slider = createSlider(0, 1, gamma, 0.0001);
+
+    g_slider = createSlider(0, 0.1, gamma, 0.0001);
     g_slider.position(slider_xpos, slider_ypos + slider_yspan * 3);
     g_slider.size(100);
-    let g_p = createP('Gamma(γ): vapour addition');
+    g_p = createP('Vapour Addition(γ): ' + gamma);
     g_p.position(g_slider.x + g_slider.width + 15, g_slider.y - 15);
+    g_slider.input(updateVariable)
+
 
 
     // create button
@@ -54,7 +64,10 @@ function setup() {
     pause_button.position(slider_xpos + 70, slider_ypos + slider_yspan * 4.5);
     pause_button.mousePressed(pause);
 
-
+    n = n_slider.value();
+    ta = a_slider.value();
+    tb = b_slider.value();
+    tg = g_slider.value();
 }
 
 
@@ -70,10 +83,10 @@ function draw() {
     // text('Beta(β): background level', b_slider.x + b_slider.width + 30, b_slider.y + 5);
     // text('Gamma(γ): vapour addition', g_slider.x + g_slider.width + 30, g_slider.y + 9);
 
-    n = n_slider.value();
-    alphaa = a_slider.value();
-    beta = b_slider.value();
-    gamma = g_slider.value();
+    // n = n_slider.value();
+    // alphaa = a_slider.value();
+    // beta = b_slider.value();
+    // gamma = g_slider.value();
 
 
     push();
@@ -88,9 +101,9 @@ function draw() {
     noStroke();
     textSize(15);
     text('n: ' + str(n), -frameSize / 2, -frameSize / 2 - 10);
-    text('α: ' + str(alphaa), -frameSize / 2, frameSize / 2 + 20);
-    text('β: ' + str(beta), -frameSize / 2, frameSize / 2 + 35);
-    text('γ: ' + str(gamma), -frameSize / 2, frameSize / 2 + 50);
+    text('α: ' + str(ta), -frameSize / 2, frameSize / 2 + 20);
+    text('β: ' + str(tb), -frameSize / 2, frameSize / 2 + 35);
+    text('γ: ' + str(tg), -frameSize / 2, frameSize / 2 + 50);
 
     translate(flakeSize * cos(240), flakeSize * sin(240))
 
@@ -125,10 +138,19 @@ function draw() {
     pop();
 }
 
+function updateVariable() {
+    n_p.html('Grid Size(n): ' + n_slider.value())
+    a_p.html('Diffusion Coefficient(α): ' + a_slider.value())
+    b_p.html('Background Level(β): ' + b_slider.value())
+    g_p.html('Vapour Addition(γ): ' + g_slider.value())
+
+}
+
 
 function restart() {
 
     nodes = [];
+    n = n_slider.value();
 
     // create hexagonal cells
     for (let i = 0; i < 2 * n + 1; i++) {
@@ -170,4 +192,14 @@ function restart() {
 
 function pause() {
     gamePause = !gamePause;
+
+    if (!gamePause) {
+        alphaa = a_slider.value();
+        beta = b_slider.value();
+        gamma = g_slider.value();
+
+        ta = alphaa;
+        tb = beta;
+        tg = gamma;
+    }
 }
